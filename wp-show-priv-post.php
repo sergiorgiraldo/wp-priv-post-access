@@ -1,13 +1,13 @@
 <?php
 /*
-Plugin Name: Show Private Posts
+Plugin Name: Private Posts Easy Access
 Plugin URI: http://me.abelcheung.org/devel/show-private-posts-in-wordpress/
 Description: Show private post links in calendar and archive
 Author: Abel Cheung
 Author URI: http://me.abelcheung.org/
-Version: 1.0
+Version: 1.1
 
-Copyright (c) 2008  Abel Cheung  (email : abelcheung at gmail [dot] com)
+Copyright (c) 2008, 09 Abel Cheung
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,22 +33,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-
 */
 
 function wppriv_show ($sql)
 {
-	global $user_ID;
-
-	if (empty ($user_ID))
-		return $sql;
-
-	if (!current_user_can ("read_private_posts"))
-		return $sql;
-
-	$val =	"WHERE post_type = 'post' AND " .
-		"( post_status = 'publish' OR " .
-		"( post_status = 'private' AND post_author = '{$user_ID}' ) )";
+	$val = "WHERE post_type = 'post' AND " .
+		get_private_posts_cap_sql( 'post' );
 
 	return $val;
 }
