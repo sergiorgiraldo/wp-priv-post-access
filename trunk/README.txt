@@ -1,15 +1,25 @@
 INSTALLATION
 ------------
 
-1. Decompress zip file.
-2. Apply the patch to wordpress source code:
+1) Decompress zip file.
+2) Apply the patch to WordPress source code, depending on operating system:
 
-   # patch <wordpress_dir>/wp-includes/general-template.php -i calendar-sql-hook.patch
+2a) On Unix platforms, install 'patch' program from software repository,
+    and patch WordPress with following command line:
 
-   <wordpress_dir> is the directory WordPress is installed.
+	patch <wordpress_dir>/wp-includes/general-template.php -i calendar-sql-hook.patch
 
-3. Copy wp-show-priv-post.php to wp-content/plugins/ folder.
-4. Activate plugin in WordPress admin page.
+    <wordpress_dir> is the directory WordPress is installed.
+
+2b) On Window platform, install 'patch' from GNUWin32 web site:
+    http://gnuwin32.sourceforge.net/packages/patch.htm
+
+    Invoke 'patch' program with '--binary' argument as well:
+
+	C:\Program Files\GNUWin32\bin\patch.exe <wordpress_dir>\wp-includes\general-template.php -i calendar-sql-hook.patch --binary
+
+3) Copy wp-show-priv-post.php to wp-content/plugins/ folder.
+4) Activate plugin in WordPress admin page.
 
 
 NOTES
