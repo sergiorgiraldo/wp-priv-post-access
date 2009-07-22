@@ -1,64 +1,61 @@
---- wp-includes/general-template.php.bak	2008-02-11 17:34:12.000000000 +0800
-+++ wp-includes/general-template.php	2008-06-19 11:59:25.000000000 +0800
-@@ -489,10 +489,13 @@ function get_calendar($initial = true) {
- 		}
- 	}
+--- wp-includes/general-template.php.bak	2009-06-11 08:04:20.000000000 +0800
++++ wp-includes/general-template.php	2009-07-19 15:04:35.000000000 +0800
+@@ -967,9 +967,13 @@
+ 	if ( !is_array($cache) )
+ 		$cache = array();
  
 +	//filters
-+	$where = apply_filters('getcalendar_where', "WHERE post_type = 'post' AND post_status = 'publish'");
++	$where = apply_filters('getcalendar_where', "WHERE post_type = 'post' AND post_status = 'publish'" );
++	$join = apply_filters('getcalendar_join', "");
 +
- 	ob_start();
  	// Quick check. If we have no posts at all, abort!
  	if ( !$posts ) {
--		$gotsome = $wpdb->get_var("SELECT ID from $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' ORDER BY post_date DESC LIMIT 1");
-+		$gotsome = $wpdb->get_var("SELECT ID from $wpdb->posts $where ORDER BY post_date DESC LIMIT 1");
- 		if ( !$gotsome )
- 			return;
- 	}
-@@ -530,16 +533,14 @@ function get_calendar($initial = true) {
+-		$gotsome = $wpdb->get_var("SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1");
++		$gotsome = $wpdb->get_var("SELECT 1 as test FROM $wpdb->posts $join $where LIMIT 1");
+ 		if ( !$gotsome ) {
+ 			$cache[ $key ] = '';
+ 			wp_cache_set( 'get_calendar', $cache, 'calendar' );
+@@ -1008,16 +1012,14 @@
  
  	// Get the next and previous month and year with at least one post
  	$previous = $wpdb->get_row("SELECT DISTINCT MONTH(post_date) AS month, YEAR(post_date) AS year
 -		FROM $wpdb->posts
 -		WHERE post_date < '$thisyear-$thismonth-01'
 -		AND post_type = 'post' AND post_status = 'publish'
-+		FROM $wpdb->posts $where
++		FROM $wpdb->posts $join $where
 +		AND post_date < '$thisyear-$thismonth-01'
  			ORDER BY post_date DESC
  			LIMIT 1");
  	$next = $wpdb->get_row("SELECT	DISTINCT MONTH(post_date) AS month, YEAR(post_date) AS year
 -		FROM $wpdb->posts
 -		WHERE post_date >	'$thisyear-$thismonth-01'
-+		FROM $wpdb->posts $where
++		FROM $wpdb->posts $join $where
 +		AND post_date >	'$thisyear-$thismonth-01'
  		AND MONTH( post_date ) != MONTH( '$thisyear-$thismonth-01' )
 -		AND post_type = 'post' AND post_status = 'publish'
  			ORDER	BY post_date ASC
  			LIMIT 1");
  
-@@ -593,9 +594,9 @@ function get_calendar($initial = true) {
+@@ -1073,9 +1075,8 @@
  
  	// Get days with posts
  	$dayswithposts = $wpdb->get_results("SELECT DISTINCT DAYOFMONTH(post_date)
 -		FROM $wpdb->posts WHERE MONTH(post_date) = '$thismonth'
-+		FROM $wpdb->posts $where
++		FROM $wpdb->posts $join $where AND MONTH(post_date) = '$thismonth'
  		AND YEAR(post_date) = '$thisyear'
 -		AND post_type = 'post' AND post_status = 'publish'
-+		AND MONTH(post_date) = '$thismonth'
  		AND post_date < '" . current_time('mysql') . '\'', ARRAY_N);
  	if ( $dayswithposts ) {
- 		foreach ( $dayswithposts as $daywith ) {
-@@ -612,11 +613,10 @@ function get_calendar($initial = true) {
- 
+ 		foreach ( (array) $dayswithposts as $daywith ) {
+@@ -1093,10 +1094,9 @@
  	$ak_titles_for_day = array();
  	$ak_post_titles = $wpdb->get_results("SELECT post_title, DAYOFMONTH(post_date) as dom "
--		."FROM $wpdb->posts "
+ 		."FROM $wpdb->posts "
 -		."WHERE YEAR(post_date) = '$thisyear' "
-+		."FROM $wpdb->posts $where"
-+		."AND YEAR(post_date) = '$thisyear' "
++		."$join $where AND YEAR(post_date) = '$thisyear' "
  		."AND MONTH(post_date) = '$thismonth' "
  		."AND post_date < '".current_time('mysql')."' "
 -		."AND post_type = 'post' AND post_status = 'publish'"
  	);
  	if ( $ak_post_titles ) {
- 		foreach ( $ak_post_titles as $ak_post_title ) {
+ 		foreach ( (array) $ak_post_titles as $ak_post_title ) {
