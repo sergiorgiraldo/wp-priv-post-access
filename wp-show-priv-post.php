@@ -5,7 +5,7 @@ Plugin URI: http://me.abelcheung.org/devel/show-private-posts-in-wordpress/
 Description: Show private post links in calendar and archive
 Author: Abel Cheung
 Author URI: http://me.abelcheung.org/
-Version: 1.2
+Version: 1.1
 
 Copyright (c) 2008, 09 Abel Cheung
 All rights reserved.
@@ -43,25 +43,7 @@ function wppriv_show ($sql)
 	return $val;
 }
 
-function wppriv_fix_post_count ($_term, $taxonomy)
-{
-	global $wpdb;
-	$count = $wpdb->get_var( $wpdb->prepare( "SELECT count(ID) FROM "
-		. "$wpdb->term_relationships AS tr INNER JOIN "
-		. "$wpdb->posts AS p ON (tr.object_id = p.ID) INNER JOIN "
-		. "$wpdb->term_taxonomy AS tt ON (tr.term_taxonomy_id = tt.term_taxonomy_id) "
-		. "WHERE tt.term_id = %s AND p.post_type = 'post'", $_term->term_id ) );
-
-	// Can't just replace count in $_term --
-	// "Attempt to assign property of non-object"
-	$retval = $_term;
-	$retval->count = $count;
-	return $retval;
-}
-
 add_filter('getcalendar_where', 'wppriv_show');
 add_filter('getarchives_where', 'wppriv_show');
-add_filter('get_category', 'wppriv_fix_post_count', 10, 2);
-add_filter('get_post_tag', 'wppriv_fix_post_count', 10, 2);
 
 ?>
