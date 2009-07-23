@@ -14,16 +14,15 @@ INSTALLATION
 2b) On Window platform, install 'patch' from GNUWin32 web site:
     http://gnuwin32.sourceforge.net/packages/patch.htm
 
-    Invoke 'patch' program with '--binary' argument as well:
+    Invoke 'patch' program, please note the '--binary' argument as well:
 
 	C:\Program Files\GNUWin32\bin\patch.exe <wordpress_dir>\wp-includes\general-template.php -i calendar-sql-hook.patch --binary
 
-3) Copy wp-show-priv-post.php to wp-content/plugins/ folder.
+3) Copy wp-priv-post-access.php to wp-content/plugins/ folder.
 4) Activate plugin in WordPress admin page.
 
 
 NOTES
 -----
-If patch is not applied, the plugin still works partially;
-monthly archive still shows links to months containing private post.
-But behaviour of calendar would not change at all.
+If patch is not applied, most part of the plugin still works;
+only that behavior of calendar would not change at all.
