@@ -5,9 +5,9 @@ Plugin URI: http://me.abelcheung.org/devel/show-private-posts-in-wordpress/
 Description: Show private post links in monthly archive, calendar, and admin interface
 Author: Abel Cheung
 Author URI: http://me.abelcheung.org/
-Version: 1.3.0
+Version: 1.2.0
 
-Copyright (c) 2008, 2009, 2010 Abel Cheung
+Copyright (c) 2008, 09 Abel Cheung
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,11 +43,7 @@ function wppriv_show ($sql)
 	return $val;
 }
 
-/*
- * Replace post count manually for each category or tag,
- * instead of using the count stored in database
- */
-function wppriv_fix_post_count ($terms, $taxonomies, $args)
+function wppriv_fix_post_count ($terms, $taxonomies)
 {
 	global $wpdb;
 
@@ -56,32 +52,20 @@ function wppriv_fix_post_count ($terms, $taxonomies, $args)
 		return $terms;
 
 	foreach ($terms as $term) {
-		$term->count = $wpdb->get_var( $wpdb->prepare( "SELECT count(ID) FROM "
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT count(ID) FROM "
 			. "$wpdb->term_relationships AS tr INNER JOIN "
 			. "$wpdb->posts AS p ON (tr.object_id = p.ID) INNER JOIN "
 			. "$wpdb->term_taxonomy AS tt ON (tr.term_taxonomy_id = tt.term_taxonomy_id) "
 			. "WHERE tt.term_id = %s AND p.post_type = 'post' AND "
 			. get_private_posts_cap_sql( 'post' ), $term->term_id ) );
+		$term->count = $count;
 	}
 
 	return $terms;
 }
 
-/*
- * Don't hide empty categories in category widget when logged in
- * This is an internim solution, until get_terms() also retrieves
- * categories with count = 0
- */
-function wppriv_cat_no_hide_empty ($cat_args)
-{
-	$user = wp_get_current_user();
-	return ( $user->ID ) ? array_merge( $cat_args, array( 'hide_empty' => false ) ) : $cat_args;
-}
-
-add_filter( 'getcalendar_where', 'wppriv_show' );
-add_filter( 'getarchives_where', 'wppriv_show' );
-add_filter( 'get_terms', 'wppriv_fix_post_count', 10, 3 );
-add_filter( 'widget_categories_dropdown_args', 'wppriv_cat_no_hide_empty' );
-add_filter( 'widget_categories_args', 'wppriv_cat_no_hide_empty' );
+add_filter('getcalendar_where', 'wppriv_show');
+add_filter('getarchives_where', 'wppriv_show');
+add_filter('get_terms', 'wppriv_fix_post_count', 10, 2);
 
 ?>
